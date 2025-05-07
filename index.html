@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar Web Push Notificações</title>
+     <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+        }
+        h1 {
+            color: #0056b3;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        div {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+         input[type="text"]:focus, input[type="number"]:focus {
+             border-color: #007bff;
+             outline: none;
+         }
+         input[type="number"] {
+             -moz-appearance: textfield;
+         }
+         input[type="number"]::-webkit-outer-spin-button,
+         input[type="number"]::-webkit-inner-spin-button {
+             -webkit-appearance: none;
+             margin: 0;
+         }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+         button:active {
+             background-color: #004080;
+         }
+         button:disabled {
+             background-color: #ccc;
+             cursor: not-allowed;
+         }
+        #status {
+            margin-top: 25px;
+            font-weight: bold;
+            text-align: center;
+            color: #007bff;
+            min-height: 1.2em;
+        }
+         .info-text {
+             margin-top: 30px;
+             font-size: 0.9em;
+             color: #666;
+             text-align: center;
+             line-height: 1.5;
+         }
+         .warning-text {
+             color: #dc3545;
+             font-weight: bold;
+         }
+    </style>
+</head>
+<body>
+
+    <h1>Configurar Notificações Agendadas</h1>
+
+    <div class="container">
+        <div>
+            <label for="notificationText">Texto da Notificação:</label>
+            <input type="text" id="notificationText" value="Lembrete: Beba água!">
+        </div>
+
+        <div>
+            <label for="repeatCount">Número de Repetições:</label>
+            <input type="number" id="repeatCount" value="5" min="1">
+        </div>
+
+         <div>
+            <label for="intervalTime">Intervalo entre Notificações (segundos):</label>
+            <input type="number" id="intervalTime" value="60" min="5">
+             <small>Use segundos (ex: 60 para 1 minuto, 3600 para 1 hora)</small>
+        </div>
+
+        <button id="startButton">Salvar Configuração no Servidor</button>
+
+    </div>
+
+    <p><span id="status"></span></p>
+
+     <p class="info-text warning-text">
+         Esta é apenas a PARTE DO CLIENTE. Ela SALVA sua configuração no servidor.
+         O SERVIDOR precisa estar funcionando para receber os dados e enviar as notificações push agendadas.
+     </p>
+
+    <p class="info-text">
+        Estas notificações funcionam mesmo com a aba fechada, pois são enviadas pelo servidor via serviço Push do navegador.
+        Você precisará conceder permissão para Notificações e Push.
+    </p>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
