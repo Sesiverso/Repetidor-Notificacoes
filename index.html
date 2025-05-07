@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Notificações Web</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        div {
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Gerador de Notificações Web</h1>
+
+    <div>
+        <label for="notificationText">Texto da Notificação:</label>
+        <input type="text" id="notificationText" value="Olá! Esta é uma notificação de exemplo.">
+    </div>
+
+    <div>
+        <label for="repeatCount">Número de Repetições:</label>
+        <input type="number" id="repeatCount" value="5" min="1">
+    </div>
+
+    <button id="startButton">Iniciar Notificações</button>
+
+    <p><span id="status"></span></p>
+
+    <script>
+        const notificationText = document.getElementById('notificationText');
+        const repeatCountInput = document.getElementById('repeatCount');
+        const startButton = document.getElementById('startButton');
+        const statusSpan = document.getElementById('status');
+
+        let intervalId = null;
+        let currentRepetition = 0;
+        const repeatInterval = 3000; // Intervalo em milissegundos (ex: 3000ms = 3 segundos)
+
+        // Função para solicitar permissão
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                alert('Este navegador não suporta notificações de desktop.');
+                statusSpan.textContent = 'Este navegador não suporta notificações.';
+                return Promise.resolve('denied'); // Retorna uma promessa rejeitada simbolicamente
+            }
+
+            // Solicita permissão se ainda não foi concedida ou negada
+            if (Notification.permission === 'default') {
+                statusSpan.textContent = 'Solicitando permissão...';
+                return Notification.requestPermission();
+            } else {
+                statusSpan.textContent = `Permissão: ${Notification.permission}`;
+                return Promise.resolve(Notification.permission); // Retorna o estado atual da permissão
+            }
+        }
+
+        // Função para mostrar uma notificação
+        function showNotification(message) {
+            if (Notification.permission === 'granted') {
+                currentRepetition++;
+                new Notification(`Notificação ${currentRepetition}`, {
+                    body: message,
+                    // Opcional: ícone para a notificação
+                    // icon: 'caminho/para/seu/icone.png'
+                });
+                statusSpan.textContent = `Enviando notificação ${currentRepetition} de ${repeatCountInput.value}...`;
+
+                // Parar após atingir o número de repetições
+                if (currentRepetition >= parseInt(repeatCountInput.value)) {
+                    stopNotifications();
+                    statusSpan.textContent = `Concluído! Enviadas ${repeatCountInput.value} notificações.`;
+                }
+            } else {
+                statusSpan.textContent = `Permissão de notificação não concedida (${Notification.permission}).`;
+                stopNotifications(); // Parar se a permissão for revogada
+            }
+        }
+
+        // Função para iniciar o agendamento das notificações
+        function startNotifications() {
+            const message = notificationText.value.trim();
+            const count = parseInt(repeatCountInput.value);
+
+            if (message === '') {
+                statusSpan.textContent = 'Por favor, digite o texto da notificação.';
+                return;
+            }
+            if (isNaN(count) || count <= 0) {
+                statusSpan.textContent = 'Por favor, insira um número de repetições válido (> 0).';
+                return;
+            }
+
+            // Limpa qualquer agendamento anterior
+            stopNotifications();
+            currentRepetition = 0;
+
+            requestNotificationPermission().then(permission => {
+                if (permission === 'granted') {
+                    statusSpan.textContent = `Permissão concedida. Iniciando notificações em ${repeatInterval / 1000} segundos...`;
+                    // Agendar a primeira notificação e as subsequentes
+                    // Usamos setTimeout para a primeira notificação e setInterval para as repetições
+                    // Alternativamente, showNotification pode ser chamada diretamente aqui e o setInterval apenas para as próximas
+                     intervalId = setInterval(() => showNotification(message), repeatInterval);
+                     // Chama a primeira imediatamente se preferir
+                     // showNotification(message);
+                     // intervalId = setInterval(() => showNotification(message), repeatInterval);
+
+
+                } else {
+                    statusSpan.textContent = `Permissão de notificação negada. Não é possível enviar notificações.`;
+                }
+            });
+        }
+
+        // Função para parar o agendamento
+        function stopNotifications() {
+            if (intervalId !== null) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        // Adiciona o evento ao botão
+        startButton.addEventListener('click', startNotifications);
+
+        // Opcional: Verifica o status da permissão ao carregar a página
+        window.addEventListener('load', () => {
+             if ('Notification' in window) {
+                 statusSpan.textContent = `Status da permissão: ${Notification.permission}`;
+             } else {
+                 statusSpan.textContent = 'Este navegador não suporta notificações.';
+             }
+        });
+
+        // Opcional: Limpa o intervalo se o usuário sair da página
+        window.addEventListener('beforeunload', stopNotifications);
+
+    </script>
+
+</body>
+</html>
